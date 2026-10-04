@@ -186,7 +186,7 @@ function Index() {
     setServerError(null);
   };
 
-  const validate = (): boolean => {
+  const validate = (): SubmitTutorRequestInput | null => {
     const next: Partial<Record<keyof FormState, string>> = {};
     if (!form.studentClass) next.studentClass = "শ্রেণি নির্বাচন করুন";
     if (!form.subject.trim()) next.subject = "বিষয় লিখুন";
@@ -198,14 +198,10 @@ function Index() {
       next.whatsappPhone = "সঠিক WhatsApp নম্বর দিন বা ঘরটি ফাঁকা রাখুন";
     if (!form.tutorPreference) next.tutorPreference = "টিউটর পছন্দ নির্বাচন করুন";
     setErrors(next);
-    return Object.keys(next).length === 0;
-  };
+    if (Object.keys(next).length > 0 || !form.studentGender || !form.tutorPreference)
+      return null;
 
-  const handleSubmit = (event: React.FormEvent) => {
-    event.preventDefault();
-    setServerError(null);
-    if (!validate()) return;
-    mutation.mutate({
+    return {
       studentClass: form.studentClass,
       subject: form.subject.trim(),
       studentGender: form.studentGender,
@@ -214,7 +210,15 @@ function Index() {
       whatsappPhone: form.whatsappPhone.trim(),
       tutorPreference: form.tutorPreference,
       requirements: form.requirements.trim(),
-    });
+    };
+  };
+
+  const handleSubmit = (event: React.FormEvent) => {
+    event.preventDefault();
+    setServerError(null);
+    const payload = validate();
+    if (!payload) return;
+    mutation.mutate(payload);
   };
 
   if (submitted) {
