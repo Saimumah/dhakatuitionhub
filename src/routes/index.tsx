@@ -13,7 +13,10 @@ import {
   Phone,
   UserRound,
 } from "lucide-react";
-import { submitTutorRequest } from "@/lib/tutor-request.functions";
+import {
+  submitTutorRequest,
+  type SubmitTutorRequestInput,
+} from "@/lib/tutor-request.functions";
 import { isValidBdPhone } from "@/lib/bd-phone";
 
 export const Route = createFileRoute("/")({
@@ -92,9 +95,9 @@ function FieldShell({
 }: {
   number: string;
   label: string;
-  description?: string;
-  error?: string;
-  optional?: boolean;
+  description?: string | undefined;
+  error?: string | undefined;
+  optional?: boolean | undefined;
   children: React.ReactNode;
 }) {
   return (
@@ -132,7 +135,7 @@ function ChoicePill({
   label: string;
   selected: boolean;
   onSelect: () => void;
-  invalid?: boolean;
+  invalid?: boolean | undefined;
 }) {
   return (
     <button
@@ -164,7 +167,7 @@ function Index() {
 
   const submitFn = useServerFn(submitTutorRequest);
   const mutation = useMutation({
-    mutationFn: submitFn,
+    mutationFn: (input: SubmitTutorRequestInput) => submitFn({ data: input }),
     onSuccess: (result) => {
       if (result.ok) {
         setSubmitted(true);
