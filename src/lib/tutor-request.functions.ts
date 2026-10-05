@@ -69,20 +69,31 @@ export const submitTutorRequest = createServerFn({ method: "POST" })
       };
     }
 
-    const { error } = await supabaseAdmin.from("tutor_requests").insert({
-      student_class: data.studentClass,
-      subject: data.subject,
-      student_gender: data.studentGender,
-      location: data.location,
-      guardian_phone: guardianPhone,
-      whatsapp_phone: whatsappPhone,
-      tutor_preference: data.tutorPreference,
-      requirements: data.requirements || null,
-    });
+    const { data: saved, error } = await supabaseAdmin
+      .from("tutor_requests")
+      .insert({
+        student_class: data.studentClass,
+        subject: data.subject,
+        student_gender: data.studentGender,
+        location: data.location,
+        guardian_phone: guardianPhone,
+        whatsapp_phone: whatsappPhone,
+        tutor_preference: data.tutorPreference,
+        requirements: data.requirements || null,
+      })
+      .select("id, app_no")
+      .single();
 
-    if (error) {
-      console.error("[tutor_requests] insert failed:", error.message);
+    if (error || !saved) {
+      console.error("[tutor_requests] insert failed:", error?.message);
       return { ok: false, error: "তথ্য পাঠানো যায়নি। আবার চেষ্টা করুন।" };
+    }
+
+    try {
+      const { notifyOwnerOfApplication } = await import("./owner-notify.server");
+      await notifyOwnerOfApplication(saved);
+    } catch (e) {
+      console.error("[owner-notify] unexpected failure:", e);
     }
 
     return { ok: true };
