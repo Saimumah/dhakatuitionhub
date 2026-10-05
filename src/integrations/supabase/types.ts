@@ -14,42 +14,135 @@ export type Database = {
   }
   public: {
     Tables: {
+      audit_logs: {
+        Row: {
+          action: string
+          actor_email: string | null
+          actor_id: string | null
+          actor_role: string | null
+          created_at: string
+          details: Json
+          id: string
+        }
+        Insert: {
+          action: string
+          actor_email?: string | null
+          actor_id?: string | null
+          actor_role?: string | null
+          created_at?: string
+          details?: Json
+          id?: string
+        }
+        Update: {
+          action?: string
+          actor_email?: string | null
+          actor_id?: string | null
+          actor_role?: string | null
+          created_at?: string
+          details?: Json
+          id?: string
+        }
+        Relationships: []
+      }
+      staff_profiles: {
+        Row: {
+          can_manage_moderators: boolean
+          created_at: string
+          email: string
+          full_name: string
+          is_active: boolean
+          user_id: string
+        }
+        Insert: {
+          can_manage_moderators?: boolean
+          created_at?: string
+          email: string
+          full_name: string
+          is_active?: boolean
+          user_id: string
+        }
+        Update: {
+          can_manage_moderators?: boolean
+          created_at?: string
+          email?: string
+          full_name?: string
+          is_active?: boolean
+          user_id?: string
+        }
+        Relationships: []
+      }
       tutor_requests: {
         Row: {
+          app_no: number
           created_at: string
           guardian_phone: string
           id: string
           location: string
+          notification_error: string | null
+          notification_status: string
           requirements: string | null
+          status: string
           student_class: string
           student_gender: string
           subject: string
           tutor_preference: string
+          updated_at: string
           whatsapp_phone: string | null
         }
         Insert: {
+          app_no?: never
           created_at?: string
           guardian_phone: string
           id?: string
           location: string
+          notification_error?: string | null
+          notification_status?: string
           requirements?: string | null
+          status?: string
           student_class: string
           student_gender: string
           subject: string
           tutor_preference: string
+          updated_at?: string
           whatsapp_phone?: string | null
         }
         Update: {
+          app_no?: never
           created_at?: string
           guardian_phone?: string
           id?: string
           location?: string
+          notification_error?: string | null
+          notification_status?: string
           requirements?: string | null
+          status?: string
           student_class?: string
           student_gender?: string
           subject?: string
           tutor_preference?: string
+          updated_at?: string
           whatsapp_phone?: string | null
+        }
+        Relationships: []
+      }
+      user_roles: {
+        Row: {
+          created_at: string
+          id: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id?: string
         }
         Relationships: []
       }
@@ -58,10 +151,28 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      can_manage_staff: { Args: { _user_id: string }; Returns: boolean }
+      claim_ownership: { Args: { _full_name: string }; Returns: boolean }
+      get_staff_role: {
+        Args: { _user_id: string }
+        Returns: Database["public"]["Enums"]["app_role"]
+      }
+      has_role: {
+        Args: {
+          _role: Database["public"]["Enums"]["app_role"]
+          _user_id: string
+        }
+        Returns: boolean
+      }
+      is_active_staff: { Args: { _user_id: string }; Returns: boolean }
+      log_activity: {
+        Args: { _action: string; _details?: Json }
+        Returns: undefined
+      }
+      owner_exists: { Args: never; Returns: boolean }
     }
     Enums: {
-      [_ in never]: never
+      app_role: "owner" | "admin" | "moderator"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -188,6 +299,8 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      app_role: ["owner", "admin", "moderator"],
+    },
   },
 } as const
