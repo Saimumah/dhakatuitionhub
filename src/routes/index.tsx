@@ -255,6 +255,11 @@ function Index() {
   return (
     <main className="page-backdrop min-h-screen px-4 py-10 sm:py-14">
       <div className="mx-auto w-full max-w-xl">
+        <div className="-mt-4 mb-4 flex justify-end">
+          <Link to="/auth" className="rounded-full border border-border bg-card px-3 py-1 text-xs text-muted-foreground hover:text-foreground">
+            Admin Login
+          </Link>
+        </div>
         <header className="text-center">
           <div className="mx-auto grid h-16 w-16 place-items-center rounded-2xl bg-primary text-primary-foreground shadow-lg shadow-primary/25">
             <GraduationCap className="h-9 w-9" />
