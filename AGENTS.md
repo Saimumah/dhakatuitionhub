@@ -11,6 +11,7 @@
 
 # Architecture rules
 
-- Tutor lead submissions are inserted server-side (service role) in
-  `public.tutor_requests` via `src/lib/tutor-request.functions.ts`; RLS is
-  enabled with no policies, so submissions must never be read from the client.
+- Tutor lead submissions are inserted server-side (service role) via `src/lib/tutor-request.functions.ts`; only active staff can read/update them through RLS (`is_active_staff`).
+- Staff roles live in `public.user_roles` (owner/admin/moderator); DB triggers make the single owner immutable, so owner protection never relies on app code alone.
+- Staff management writes go through `src/lib/admin.functions.ts`, which verifies the caller's role before any service-role call, and writes `audit_logs`.
+- Owner notification is isolated in `src/lib/owner-notify.server.ts` and must never fail a submission; delivery state is stored on the application row for retry.
