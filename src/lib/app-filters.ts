@@ -10,8 +10,8 @@ export type AppFilter = {
 
 export const EMPTY_FILTER: AppFilter = { q: "", cls: "", loc: "", status: "all" };
 
-export type AppRow = {
-  id: string;
+/** The columns the search reads; the dashboard row carries more fields than this. */
+export type FilterableApp = {
   app_no: number;
   status: string;
   student_class: string;
@@ -33,7 +33,7 @@ function normalize(s: string): string {
     .join("");
 }
 
-export function matchesQuery(app: AppRow, query: string): boolean {
+export function matchesQuery(app: FilterableApp, query: string): boolean {
   const q = normalize(query);
   if (!q) return true;
   if (String(app.app_no).includes(q)) return true;
@@ -41,7 +41,7 @@ export function matchesQuery(app: AppRow, query: string): boolean {
     .some((f) => normalize(f).includes(q));
 }
 
-export function filterApps(apps: AppRow[], f: AppFilter): AppRow[] {
+export function filterApps<T extends FilterableApp>(apps: T[], f: AppFilter): T[] {
   return apps.filter(
     (a) =>
       (f.status === "all" || a.status === f.status) &&
@@ -62,13 +62,13 @@ function distinct(values: string[]): string[] {
 }
 
 /** Class choices: the form's class list first, then anything unexpected in the data. */
-export function classOptions(apps: AppRow[], classList: string[]): string[] {
+export function classOptions<T extends FilterableApp>(apps: T[], classList: string[]): string[] {
   const seen = distinct(apps.map((a) => a.student_class));
   const known = classList.filter((c) => seen.includes(c));
   return [...known, ...seen.filter((c) => !known.includes(c))];
 }
 
 /** Location choices: every district/area actually used by a guardian. */
-export function locationOptions(apps: AppRow[]): string[] {
+export function locationOptions<T extends FilterableApp>(apps: T[]): string[] {
   return distinct(apps.map((a) => a.location));
 }
