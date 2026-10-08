@@ -252,7 +252,7 @@ function Applications() {
           />
           <Field label="শিক্ষার্থীর শ্রেনি" value={cls} onChange={(v) => setFilter({ cls: v })} options={classOptions(data, CLASS_LIST).map((c) => ({ value: c, label: c }))} />
           <Field label="এলাকা" value={loc} onChange={(v) => setFilter({ loc: v })} options={locationOptions(data).map((l) => ({ value: l, label: l }))} />
-          <Field label="Status" value={status} onChange={(v) => setFilter({ status: v })} options={[{ value: "all", label: "সব status" }, ...APP_STATUSES.map((s) => ({ value: s, label: STATUS_LABEL[s] }))]} />
+          <Field label="Status" value={status} onChange={(v) => setFilter({ status: v })} options={[{ value: "all", label: "সব status" }, ...APP_STATUSES.map((s) => ({ value: s, label: STATUS_LABEL[s] ?? s }))]} />
         </div>
       </div>
       {rows.length === 0 && <p className="text-muted-foreground">কোনো আবেদন নেই।</p>}
