@@ -199,7 +199,7 @@ function NoRole() {
 
 function Applications() {
   const qc = useQueryClient();
-  const { app } = Route.useSearch();
+  const navigate = useNavigate({ from: "/admin" });
   const listFn = useServerFn(listApplications);
   const updateFn = useServerFn(updateApplicationStatus);
   const apps = useQuery({ queryKey: ["apps"], queryFn: () => listFn() });
@@ -297,6 +297,32 @@ function Item({ k, v }: { k: string; v: React.ReactNode }) {
       <dt className="text-muted-foreground">{k}</dt>
       <dd className="font-medium">{v}</dd>
     </>
+  );
+}
+
+/** Small labelled dropdown used by the Applications search bar. */
+function Field({
+  label,
+  value,
+  onChange,
+  options,
+}: {
+  label: string;
+  value: string;
+  onChange: (v: string) => void;
+  options: { value: string; label: string }[];
+}) {
+  return (
+    <label className="flex items-center gap-2 text-sm">
+      <span className="text-muted-foreground">{label}</span>
+      <select className={field} value={value} onChange={(e) => onChange(e.target.value)}>
+        {options.map((o) => (
+          <option key={o.value} value={o.value}>
+            {o.label}
+          </option>
+        ))}
+      </select>
+    </label>
   );
 }
 
