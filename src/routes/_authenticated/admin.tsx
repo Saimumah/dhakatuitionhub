@@ -3,6 +3,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { useEffect, useRef, useState } from "react";
 import { z } from "zod";
+import { fallback, zodValidator } from "@tanstack/zod-adapter";
 import { supabase } from "@/integrations/supabase/client";
 import {
   APP_STATUSES,
@@ -20,9 +21,25 @@ import {
   setStaffActive,
   updateApplicationStatus,
 } from "@/lib/admin.functions";
+import {
+  classOptions,
+  EMPTY_FILTER,
+  filterApps,
+  isFilterActive,
+  locationOptions,
+  type AppFilter,
+} from "@/lib/app-filters";
 
 export const Route = createFileRoute("/_authenticated/admin")({
-  validateSearch: z.object({ app: z.coerce.number().optional() }),
+  validateSearch: zodValidator(
+    z.object({
+      app: z.coerce.number().optional(),
+      q: fallback(z.string(), "").default(""),
+      cls: fallback(z.string(), "").default(""),
+      loc: fallback(z.string(), "").default(""),
+      status: fallback(z.string(), "all").default("all"),
+    }),
+  ),
   head: () => ({
     meta: [
       { title: "Dashboard — ঢাকা টিউশন হাব" },
@@ -62,6 +79,22 @@ const ACTION_LABEL: Record<string, string> = {
 const fmt = (d: string) => new Date(d).toLocaleString("bn-BD", { timeZone: "Asia/Dhaka" });
 const card = "rounded-2xl border border-border bg-card p-4";
 const field = "rounded-lg border border-input bg-background px-3 py-2 text-sm";
+const CLASS_LIST = [
+  "১ম শ্রেণি",
+  "২য় শ্রেণি",
+  "৩য় শ্রেণি",
+  "৪র্থ শ্রেণি",
+  "৫ম শ্রেণি",
+  "৬ষ্ঠ শ্রেণি",
+  "৭ম শ্রেণি",
+  "৮ম শ্রেণি",
+  "৯ম শ্রেণি",
+  "১০ম শ্রেণি",
+  "একাদশ শ্রেণি",
+  "দ্বাদশ শ্রেণি",
+  "বিশ্ববিদ্যালয়",
+  "অন্যান্য",
+];
 
 function AdminPage() {
   const navigate = useNavigate();
@@ -170,7 +203,7 @@ function Applications() {
   const listFn = useServerFn(listApplications);
   const updateFn = useServerFn(updateApplicationStatus);
   const apps = useQuery({ queryKey: ["apps"], queryFn: () => listFn() });
-  const [filter, setFilter] = useState("all");
+  const { app, q, cls, loc, status } = Route.useSearch();
   const update = useMutation({
     mutationFn: (v: { id: string; status: (typeof APP_STATUSES)[number] }) => updateFn({ data: v }),
     onSuccess: () => qc.invalidateQueries({ queryKey: ["apps"] }),
@@ -182,16 +215,45 @@ function Applications() {
 
   if (apps.isLoading) return <p className="text-muted-foreground">লোড হচ্ছে...</p>;
   if (apps.error) return <p className="text-destructive">{apps.error.message}</p>;
-  const rows = (apps.data ?? []).filter((r) => filter === "all" || r.status === filter);
+  const data = apps.data ?? [];
+  const filter: AppFilter = { q, cls, loc, status };
+  const rows = filterApps(data, filter);
+
+  const setFilter = (patch: Partial<AppFilter>) =>
+    navigate({
+      to: "/admin",
+      search: (prev) => ({ ...prev, ...patch }),
+      replace: true,
+    });
+  const clearFilters = () => setFilter({ q: "", cls: "", loc: "", status: "all" });
 
   return (
     <section>
-      <div className="mb-4 flex flex-wrap items-center gap-3">
-        <h2 className="text-lg font-semibold">Guardian Applications ({apps.data?.length ?? 0})</h2>
-        <select className={field} value={filter} onChange={(e) => setFilter(e.target.value)}>
-          <option value="all">সব status</option>
-          {APP_STATUSES.map((s) => <option key={s} value={s}>{STATUS_LABEL[s]}</option>)}
-        </select>
+      <div className="mb-4 space-y-3">
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <h2 className="text-lg font-semibold">Guardian Applications ({data.length})</h2>
+          {isFilterActive(filter) && (
+            <p className="text-sm text-muted-foreground">
+              {rows.length}টি আবেদন মিলেছە
+              <button onClick={clearFilters} className="ml-3 rounded-lg border border-border px-3 py-1.5 text-sm">
+                রিসেট
+              </button>
+            </p>
+          )}
+        </div>
+        <div className="flex flex-wrap items-center gap-3">
+          <input
+            type="search"
+            aria-label="আবেদন খুঁজুন"
+            className={`${field} min-w-[14rem] flex-1`}
+            placeholder="Application নম্বর, শ্রেনি, এলাকা, বিষয় বা ফোন লিখুন"
+            value={q}
+            onChange={(e) => setFilter({ q: e.target.value })}
+          />
+          <Field label="শিক্ষার্থীর শ্রেনি" value={cls} onChange={(v) => setFilter({ cls: v })} options={classOptions(data, CLASS_LIST).map((c) => ({ value: c, label: c }))} />
+          <Field label="এলাকা" value={loc} onChange={(v) => setFilter({ loc: v })} options={locationOptions(data).map((l) => ({ value: l, label: l }))} />
+          <Field label="Status" value={status} onChange={(v) => setFilter({ status: v })} options={[{ value: "all", label: "সব status" }, ...APP_STATUSES.map((s) => ({ value: s, label: STATUS_LABEL[s] }))]} />
+        </div>
       </div>
       {rows.length === 0 && <p className="text-muted-foreground">কোনো আবেদন নেই।</p>}
       <div className="grid gap-3 md:grid-cols-2">
