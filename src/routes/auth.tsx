@@ -2,6 +2,7 @@ import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { ownerExists } from "@/lib/admin.functions";
+import markUrl from "@/assets/logo-mark.png";
 
 export const Route = createFileRoute("/auth")({
   head: () => ({
@@ -74,7 +75,9 @@ function AuthPage() {
   return (
     <main className="page-backdrop flex min-h-screen items-center justify-center px-4 py-10">
       <div className="w-full max-w-sm rounded-3xl border border-border bg-card p-7 shadow-sm">
+        <img src={markUrl} alt="" className="mb-3 h-12 w-auto" />
         <h1 className="font-display text-2xl font-bold text-foreground">ঢাকা টিউশন হাব</h1>
+
         <p className="mt-1 text-sm text-muted-foreground">
           {mode === "login" ? "Admin Login" : mode === "setup" ? "প্রথম Owner সেটআপ" : "পাসওয়ার্ড রিসেট"}
         </p>
