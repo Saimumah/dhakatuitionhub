@@ -5,6 +5,7 @@ import { useEffect, useRef, useState } from "react";
 import { z } from "zod";
 import { fallback, zodValidator } from "@tanstack/zod-adapter";
 import { supabase } from "@/integrations/supabase/client";
+import markUrl from "@/assets/logo-mark.png";
 import {
   APP_STATUSES,
   changeStaffRole,

@@ -2,6 +2,7 @@ import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { ownerExists } from "@/lib/admin.functions";
+import markUrl from "@/assets/logo-mark.png";
 
 export const Route = createFileRoute("/auth")({
   head: () => ({

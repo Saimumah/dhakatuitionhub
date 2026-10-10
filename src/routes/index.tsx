@@ -18,6 +18,7 @@ import {
   type SubmitTutorRequestInput,
 } from "@/lib/tutor-request.functions";
 import { isValidBdPhone } from "@/lib/bd-phone";
+import logoUrl from "@/assets/logo.png";
 
 export const Route = createFileRoute("/")({
   head: () => ({
