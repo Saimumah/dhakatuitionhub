@@ -7,7 +7,6 @@ import {
   CheckCircle2,
   ChevronDown,
   ClipboardList,
-  GraduationCap,
   MapPin,
   MessageCircle,
   Phone,
