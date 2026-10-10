@@ -261,9 +261,12 @@ function Index() {
           </Link>
         </div>
         <header className="text-center">
-          <div className="mx-auto grid h-16 w-16 place-items-center rounded-2xl bg-primary text-primary-foreground shadow-lg shadow-primary/25">
-            <GraduationCap className="h-9 w-9" />
-          </div>
+          <img
+            src={logoUrl}
+            alt="ঢাকা টিউশন হাব — Dhaka Tuition Hub"
+            className="mx-auto h-28 w-auto sm:h-32"
+          />
+
           <h1 className="mt-5 font-display text-3xl font-bold leading-snug text-foreground sm:text-4xl">
             আপনার সন্তানের জন্য টিউটর খুঁজছেন?
           </h1>

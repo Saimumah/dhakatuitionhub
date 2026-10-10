@@ -145,10 +145,14 @@ function Shell({ children, onSignOut, who }: { children: React.ReactNode; onSign
     <main className="min-h-screen bg-background px-4 py-6">
       <div className="mx-auto max-w-6xl">
         <header className="mb-6 flex flex-wrap items-center justify-between gap-3">
-          <div>
-            <h1 className="font-display text-2xl font-bold text-foreground">ঢাকা টিউশন হাব — Dashboard</h1>
-            {who && <p className="text-sm text-muted-foreground">{who}</p>}
+          <div className="flex items-center gap-3">
+            <img src={markUrl} alt="" className="h-11 w-11" />
+            <div>
+              <h1 className="font-display text-2xl font-bold text-foreground">ঢাকা টিউশন হাব — Dashboard</h1>
+              {who && <p className="text-sm text-muted-foreground">{who}</p>}
+            </div>
           </div>
+
           <button onClick={onSignOut} className="rounded-lg border border-border px-4 py-2 text-sm">লগআউট</button>
         </header>
         {children}
